@@ -1,0 +1,17 @@
+{
+    "debug": true,
+    "server": {
+        "address": 3000
+    },
+    "context": {
+        "timeout": 10
+    },
+    "database": {
+        "driver": "mysql",
+        "host": "localhost",
+        "port": "3306",
+        "db_name": "mahasiswa",
+        "db_user": "maman",
+        "db_password": "123459"
+    }
+}
