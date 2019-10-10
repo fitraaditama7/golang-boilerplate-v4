@@ -3,7 +3,6 @@ package mahasiswa
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"golang-websocket/api/models"
 	"golang-websocket/api/repository"
 	"strconv"
@@ -21,15 +20,15 @@ func NewMahasiswaRepository(Conn *sql.DB) repository.MahasiswaRepository {
 func (m *mysqlMahasiswaRepository) List(ctx context.Context) ([]*models.Mahasiswa, error) {
 	var mahasiswas []*models.Mahasiswa
 
-	query := `SELECT * FROM mahasiswa`
+	query := `SELECT id, nim, nama, kelas FROM mahasiswa`
 
 	rows, err := m.Conn.QueryContext(ctx, query)
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	// defer func() {
+	// 	err := rows.Close()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// }()
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +52,7 @@ func (m *mysqlMahasiswaRepository) List(ctx context.Context) ([]*models.Mahasisw
 func (m *mysqlMahasiswaRepository) Detail(ctx context.Context, id int) (*models.Mahasiswa, error) {
 	var mahasiswa models.Mahasiswa
 	ids := strconv.Itoa(id)
-	query := `SELECT * FROM mahasiswa WHERE id = ` + ids
+	query := `SELECT id, nim, nama, kelas FROM mahasiswa WHERE id = ` + ids
 	err := m.Conn.QueryRowContext(ctx, query).Scan(&mahasiswa.ID, &mahasiswa.Nim, &mahasiswa.Nama, &mahasiswa.Kelas)
 	if err != nil {
 		return nil, err
@@ -62,8 +61,13 @@ func (m *mysqlMahasiswaRepository) Detail(ctx context.Context, id int) (*models.
 }
 
 func (m *mysqlMahasiswaRepository) Insert(ctx context.Context, mahasiswa models.Mahasiswa) (*models.Mahasiswa, error) {
-	query := fmt.Sprintf(`INSERT INTO mahasiswa (nim, nama, kelas) VALUES("%s", "%s", "%s")`, mahasiswa.Nim, mahasiswa.Nama, mahasiswa.Kelas)
-	res, err := m.Conn.ExecContext(ctx, query)
+	query := `INSERT INTO mahasiswa (nim, nama, kelas) VALUES(?, ?, ?)`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := stmt.ExecContext(ctx, mahasiswa.Nim, mahasiswa.Nama, mahasiswa.Kelas)
 	if err != nil {
 		return nil, err
 	}
@@ -78,9 +82,12 @@ func (m *mysqlMahasiswaRepository) Insert(ctx context.Context, mahasiswa models.
 
 func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]interface{}, ids int) (int, error) {
 	query := `UPDATE mahasiswa SET`
+
+	var data []interface{}
 	for index, value := range datas {
 		if value != "" {
-			query = query + " " + index + ` = "` + value.(string) + `", `
+			query = query + " " + index + ` = ?, `
+			data = append(data, value)
 		}
 	}
 	query = strings.TrimRight(query, ", ")
@@ -88,7 +95,11 @@ func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]
 	id := strconv.Itoa(ids)
 	query = query + " WHERE id = " + id
 
-	_, err := m.Conn.ExecContext(ctx, query)
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 0, err
+	}
+	_, err = stmt.ExecContext(ctx, data...)
 	if err != nil {
 		return 0, err
 	}
@@ -98,8 +109,13 @@ func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]
 
 func (m *mysqlMahasiswaRepository) Delete(ctx context.Context, id int) error {
 	ids := strconv.Itoa(id)
-	query := `DELETE FROM mahasiswa WHERE id = ` + ids
-	_, err := m.Conn.ExecContext(ctx, query)
+	query := `DELETE FROM mahasiswa WHERE id = ?`
+
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.ExecContext(ctx, query, ids)
 	if err != nil {
 		return err
 	}

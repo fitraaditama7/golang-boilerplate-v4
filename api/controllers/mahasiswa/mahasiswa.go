@@ -58,10 +58,16 @@ func (m *MahasiswaHandler) Insert(c *gin.Context) {
 		ctx = context.Background()
 	}
 
+	if err := c.ShouldBindJSON(&mahasiswa); err != nil {
+		helper.ErrorCustomStatus(res, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var validators *validator.Validate
 	config := &validator.Config{TagName: "validate"}
 	validators = validator.New(config)
 	err := validators.Struct(mahasiswa)
+
 	if err != nil {
 		helper.ErrorCustomStatus(res, http.StatusBadRequest, err.Error())
 		return
