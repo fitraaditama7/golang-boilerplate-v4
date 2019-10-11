@@ -6,9 +6,9 @@ CRUD API Boilerplate using clean architecture
 ## Installation
 
 ### Prerequisites
-- Golang - Download and Install [Golang](https://golang.org/)
+- Golang(>=1.11) - Download and Install [Golang](https://golang.org/)
 ```
-  $ https://github.com/fitraaditama7/arkademy-form-submission
+  $ https://github.com/fitraaditama7/golang-boilerplate-v4
   $ cd golang-boilerplate-v4
   $ go mod download
   $ go build 
