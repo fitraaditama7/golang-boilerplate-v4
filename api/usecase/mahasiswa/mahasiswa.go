@@ -62,7 +62,7 @@ func (u *mahasiswaUsecase) Update(c context.Context, datas map[string]interface{
 		return nil, err
 	}
 
-	_, err = u.mahasiswaRepo.Update(ctx, datas, id)
+	err = u.mahasiswaRepo.Update(ctx, datas, id)
 	if err != nil {
 		return nil, err
 	}

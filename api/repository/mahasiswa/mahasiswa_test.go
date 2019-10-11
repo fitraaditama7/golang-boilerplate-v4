@@ -103,7 +103,7 @@ func TestUpdate(t *testing.T) {
 	prep.ExpectExec().WithArgs("Dadangs").WillReturnResult(sqlmock.NewResult(3, 1))
 
 	a := NewMahasiswaRepository(db)
-	_, err = a.Update(context.TODO(), datas, ids)
+	err = a.Update(context.TODO(), datas, ids)
 	assert.NoError(t, err)
 }
 

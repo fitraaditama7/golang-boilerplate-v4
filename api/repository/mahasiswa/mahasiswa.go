@@ -80,7 +80,7 @@ func (m *mysqlMahasiswaRepository) Insert(ctx context.Context, mahasiswa models.
 	return &mahasiswa, nil
 }
 
-func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]interface{}, ids int) (int, error) {
+func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]interface{}, ids int) error {
 	query := `UPDATE mahasiswa SET`
 
 	var data []interface{}
@@ -97,14 +97,14 @@ func (m *mysqlMahasiswaRepository) Update(ctx context.Context, datas map[string]
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	_, err = stmt.ExecContext(ctx, data...)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	return 1, nil
+	return nil
 }
 
 func (m *mysqlMahasiswaRepository) Delete(ctx context.Context, id int) error {
