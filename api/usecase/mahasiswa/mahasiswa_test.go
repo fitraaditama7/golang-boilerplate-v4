@@ -155,20 +155,6 @@ func TestUpdate(t *testing.T) {
 		assert.Nil(t, mahasiswa)
 		mockMahasiswaRepo.AssertExpectations(t)
 	})
-
-	// t.Run("mahasiswa-not-found", func(t *testing.T) {
-	// 	mockMahasiswaRepo.On("Detail", mock.Anything, mock.Anything).Return(nil, nil)
-	// 	mockMahasiswaRepo.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("unexpected error")).Once()
-	// 	mockMahasiswaRepo.On("Detail", mock.Anything, mock.Anything).Return(nil, nil)
-
-	// 	u := NewMahasiswaUsecase(mockMahasiswaRepo, time.Second*2)
-
-	// 	mahasiswa, err := u.Update(context.TODO(), mockMahasiswa, id)
-
-	// 	assert.Error(t, err)
-	// 	assert.Nil(t, mahasiswa)
-	// 	mockMahasiswaRepo.AssertExpectations(t)
-	// })
 }
 
 func TestDelete(t *testing.T) {
