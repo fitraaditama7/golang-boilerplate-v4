@@ -2,17 +2,31 @@ package mahasiswa
 
 import (
 	"context"
+	"golang-websocket/api/database"
 	"golang-websocket/api/helper"
 	"golang-websocket/api/models"
+	"golang-websocket/api/repository/mahasiswa"
 	"golang-websocket/api/usecase"
+	ucase "golang-websocket/api/usecase/mahasiswa"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"gopkg.in/go-playground/validator.v8"
+	"github.com/spf13/viper"
 )
 
 type MahasiswaHandler struct {
 	MahasiswaUsecase usecase.MahasiswaUsecase
+}
+
+func NewMahasiswaHandler() MahasiswaHandler {
+	timeout := time.Duration(viper.GetInt(`context.timeout`)) * time.Second
+	db := database.Load()
+	repoMahasiswa := mahasiswa.NewMahasiswaRepository(db)
+	ucaseMahasiswa := ucase.NewMahasiswaUsecase(repoMahasiswa, timeout)
+	return MahasiswaHandler{
+		MahasiswaUsecase: ucaseMahasiswa,
+	}
 }
 
 func (m *MahasiswaHandler) List(c *gin.Context) {
@@ -63,15 +77,15 @@ func (m *MahasiswaHandler) Insert(c *gin.Context) {
 		return
 	}
 
-	var validators *validator.Validate
-	config := &validator.Config{TagName: "validate"}
-	validators = validator.New(config)
-	err := validators.Struct(mahasiswa)
+	// var validators *validator.Validate
+	// config := &validator.Config{TagName: "validate"}
+	// validators = validator.New(config)
+	// err := validators.Struct(mahasiswa)
 
-	if err != nil {
-		helper.ErrorCustomStatus(res, http.StatusBadRequest, err.Error())
-		return
-	}
+	// if err != nil {
+	// 	helper.ErrorCustomStatus(res, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
 
 	result, err := m.MahasiswaUsecase.Insert(ctx, mahasiswa)
 	if err != nil {

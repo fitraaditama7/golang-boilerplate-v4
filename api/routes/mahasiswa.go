@@ -1,20 +1,14 @@
 package routes
 
 import (
-	"database/sql"
-	handler "golang-websocket/api/controllers/mahasiswa"
-	repo "golang-websocket/api/repository/mahasiswa"
-	ucase "golang-websocket/api/usecase/mahasiswa"
-	"time"
+	"golang-websocket/api/controllers/mahasiswa"
 
 	"github.com/gin-gonic/gin"
 )
 
-func RouteMahasiswa(route *gin.RouterGroup, db *sql.DB, timeOut time.Duration) {
-	repoMahasiswa := repo.NewMahasiswaRepository(db)
-	ucaseMahasiswa := ucase.NewMahasiswaUsecase(repoMahasiswa, timeOut)
-	handlerMahasiswa := handler.MahasiswaHandler{MahasiswaUsecase: ucaseMahasiswa}
+func RouteMahasiswa(route *gin.RouterGroup) {
 
+	handlerMahasiswa := mahasiswa.NewMahasiswaHandler()
 	router := route.Group("/mahasiswa")
 	{
 		router.GET("/list", handlerMahasiswa.List)
