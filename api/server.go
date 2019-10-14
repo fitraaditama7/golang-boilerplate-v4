@@ -16,6 +16,7 @@ func SetupRouter() *gin.Engine {
 	v1 := router.Group("/v1")
 	{
 		routes.RouteMahasiswa(v1)
+		routes.RouterUser(v1)
 	}
 	return router
 }
