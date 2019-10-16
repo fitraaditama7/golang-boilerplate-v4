@@ -132,3 +132,25 @@ func (m *mysqlUserRepository) Delete(ctx context.Context, id int) error {
 
 	return nil
 }
+
+func (m *mysqlUserRepository) Login(ctx context.Context, username string, password string) (*models.User, error) {
+	var user models.User
+	query := `SELECT * FROM user WHERE username = ? AND password = ?`
+
+	err := m.Conn.QueryRowContext(ctx, query, username, password).Scan(&user.ID, &user.Nama, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (m *mysqlUserRepository) CheckUser(ctx context.Context, username string) error {
+	var user models.User
+	query := `SELECT * FROM user WHERE username = ?`
+
+	err := m.Conn.QueryRowContext(ctx, query, username).Scan(&user.ID, &user.Nama, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}

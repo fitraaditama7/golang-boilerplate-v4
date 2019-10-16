@@ -6,6 +6,7 @@
     "context": {
         "timeout": 10
     },
+    "secret": "cobajwtgantengcuykerenkeren",
     "database": {
         "driver": "mysql",
         "host": "localhost",
