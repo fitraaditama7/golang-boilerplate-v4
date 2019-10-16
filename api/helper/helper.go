@@ -59,3 +59,12 @@ func HandlerErrorQuery(res http.ResponseWriter, err error) {
 		return
 	}
 }
+
+func Include(arr []string, val string) bool {
+	for _, value := range arr {
+		if value == val {
+			return true
+		}
+	}
+	return false
+}

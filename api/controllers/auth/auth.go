@@ -50,7 +50,7 @@ func (u *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := authentication.GenerateToken()
+	token, err := authentication.GenerateToken(user)
 	if err != nil {
 		helper.ErrorCustomStatus(res, http.StatusInternalServerError, err.Error())
 		return
