@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"golang-websocket/api/helper/authentication"
 	"golang-websocket/api/models"
 	"golang-websocket/api/repository"
 	"golang-websocket/api/usecase"
@@ -25,18 +27,15 @@ func (a *authUsecase) Login(c context.Context, username string, password string)
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
 
-	err := a.userRepo.CheckUser(ctx, username)
+	user, err := a.userRepo.CheckUser(ctx, username)
 	if err == sql.ErrNoRows {
 		return nil, "User not found", err
 	} else if err != nil {
 		return nil, "", err
 	}
 
-	user, err := a.userRepo.Login(ctx, username, password)
-	if err == sql.ErrNoRows {
-		return nil, "Wrong password", err
-	} else if err != nil {
-		return nil, "", err
+	if authentication.ComparePassword(user.Password, password) == false {
+		return nil, "", errors.New("Password Doesn't Match")
 	}
 
 	return user, "Login Success", nil

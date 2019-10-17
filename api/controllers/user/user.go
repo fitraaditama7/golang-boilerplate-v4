@@ -77,6 +77,12 @@ func (u *UserHandler) Insert(c *gin.Context) {
 		return
 	}
 
+	email := helper.IsEmail(user.Email)
+	if email == false {
+		helper.ErrorCustomStatus(res, http.StatusBadRequest, "Invalid email")
+		return
+	}
+
 	result, err := u.UserUsecase.Insert(ctx, user)
 	if err != nil {
 		helper.ErrorCustomStatus(res, http.StatusInternalServerError, err.Error())

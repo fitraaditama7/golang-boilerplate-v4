@@ -11,5 +11,6 @@ func RouteAuth(route *gin.RouterGroup) {
 	router := route.Group("/auth")
 	{
 		router.POST("/login", handlerAuth.Login)
+		router.POST("/register", handlerAuth.Register)
 	}
 }

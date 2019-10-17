@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"golang-websocket/api/helper/authentication"
 	"golang-websocket/api/models"
 	"golang-websocket/api/repository"
 	"golang-websocket/api/usecase"
@@ -46,6 +47,12 @@ func (u *userUsecase) Detail(c context.Context, id int) (*models.User, error) {
 func (u *userUsecase) Insert(c context.Context, user models.User) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(c, u.contextTimeout)
 	defer cancel()
+
+	pwd, err := authentication.SetPassword(user.Password)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = pwd
 
 	users, err := u.userRepo.Insert(ctx, user)
 	if err != nil {

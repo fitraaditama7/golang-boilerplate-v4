@@ -144,13 +144,13 @@ func (m *mysqlUserRepository) Login(ctx context.Context, username string, passwo
 	return &user, nil
 }
 
-func (m *mysqlUserRepository) CheckUser(ctx context.Context, username string) error {
+func (m *mysqlUserRepository) CheckUser(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
 	query := `SELECT * FROM user WHERE username = ?`
 
 	err := m.Conn.QueryRowContext(ctx, query, username).Scan(&user.ID, &user.Nama, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &user, nil
 }

@@ -5,9 +5,11 @@ import (
 	"golang-websocket/api/database"
 	"golang-websocket/api/helper"
 	"golang-websocket/api/helper/authentication"
+	"golang-websocket/api/models"
 	"golang-websocket/api/repository/user"
 	"golang-websocket/api/usecase"
 	ucase "golang-websocket/api/usecase/auth"
+	ucaseUser "golang-websocket/api/usecase/user"
 	"net/http"
 	"time"
 
@@ -17,6 +19,7 @@ import (
 
 type AuthHandler struct {
 	AuthUsecase usecase.AuthUsecase
+	UserUsecase usecase.UserUsecase
 }
 
 func NewAuthHandler() AuthHandler {
@@ -24,9 +27,11 @@ func NewAuthHandler() AuthHandler {
 	db := database.Load()
 	repoUser := user.NewUserRepository(db)
 	ucaseAutch := ucase.NewAuthUsecase(repoUser, timeout)
+	ucaseUsers := ucaseUser.NewUserUsecase(repoUser, timeout)
 
 	return AuthHandler{
 		AuthUsecase: ucaseAutch,
+		UserUsecase: ucaseUsers,
 	}
 }
 
@@ -59,4 +64,42 @@ func (u *AuthHandler) Login(c *gin.Context) {
 	data["user"] = user
 	data["token"] = token
 	helper.Responses(res, http.StatusOK, msg, data)
+}
+
+func (u *AuthHandler) Register(c *gin.Context) {
+	var res = c.Writer
+	var user models.User
+	var ctx = c.Request.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	nama := c.Request.FormValue("nama")
+	username := c.Request.FormValue("username")
+	email := c.Request.FormValue("email")
+	password := c.Request.FormValue("password")
+	passwordConfirm := c.Request.FormValue("password_confirm")
+
+	if password != passwordConfirm {
+		helper.ErrorCustomStatus(res, http.StatusBadRequest, "Password doesn't match")
+		return
+	}
+
+	if helper.IsEmail(email) == false {
+		helper.ErrorCustomStatus(res, http.StatusBadRequest, "Invalid email")
+		return
+	}
+
+	user.Nama = nama
+	user.Username = username
+	user.Email = email
+	user.Password = password
+
+	result, err := u.UserUsecase.Insert(ctx, user)
+	if err != nil {
+		helper.ErrorCustomStatus(res, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	helper.Responses(res, http.StatusOK, "Success", result)
 }

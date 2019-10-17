@@ -12,5 +12,5 @@ type UserRepository interface {
 	Update(ctx context.Context, datas map[string]interface{}, id int) error
 	Delete(ctx context.Context, id int) error
 	Login(ctx context.Context, username string, password string) (*models.User, error)
-	CheckUser(ctx context.Context, username string) error
+	CheckUser(ctx context.Context, username string) (*models.User, error)
 }
